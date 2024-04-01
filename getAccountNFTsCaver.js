@@ -40,11 +40,16 @@ const getAccountNFTsCaver = async function (nftAddress, account) {
         filter: { from: account }
     });
 
-    const incomingTokenIds = new Set(incomingTransferEvents.map(event => event.returnValues.tokenId));
+    const incomingTokenIds = new Set(
+        incomingTransferEvents.map(event => event.returnValues.tokenId)
+            .filter(tokenId => !outgoingTokenIds.has(tokenId))
+    );
+
     const outgoingTokenIds = new Set(outgingTransferEvents.map(event => event.returnValues.tokenId));
 
-    const owned = [...incomingTokenIds].filter(tokenId => !outgoingTokenIds.has(tokenId));
+    const owned = [...incomingTokenIds]
 
+    return owned;
 }
 
 
