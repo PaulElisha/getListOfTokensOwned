@@ -15,14 +15,14 @@ const getAccountNFTsEthers = async function (nftAddress, account) {
         to: account
     });
 
-    const incomingTokenIds = new Set(
+    const outgoingNftIds = new Set(outogingTransferEvents.map(event => event.args.tokenId));
+
+    const incomingNftIds = new Set(
         incomingTransferEvents.map(event => event.args.tokenId)
-            .filter(tokenId => !outgoingTokenIds.has(tokenId))
+            .filter(tokenId => !outgoingNftIds.has(tokenId))
     );
 
-    const outgoingTokenIds = new Set(outogingTransferEvents.map(event => event.args.tokenId));
-
-    const owned = [...incomingTokenIds];
+    const owned = [...incomingNftIds];
 
     return owned;
 }

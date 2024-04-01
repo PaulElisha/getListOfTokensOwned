@@ -1,34 +1,12 @@
 const Caver = require('caver-js');
 
 const caver = new Caver('YOUR_RPC_ENDPOINT');
+const ERC721 = require('@openzeppelin/contracts/build/contracts/ERC721.json');
 
 const getAccountNFTsCaver = async function (nftAddress, account) {
 
     const contract = new caver.contract({
-        abi: [
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "name": "from",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": true,
-                        "name": "to",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": true,
-                        "name": "tokenId",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "Transfer",
-                "type": "event"
-            }
-        ],
+        abi: ERC721.abi,
         address: nftAddress
     });
 
@@ -40,14 +18,14 @@ const getAccountNFTsCaver = async function (nftAddress, account) {
         filter: { from: account }
     });
 
-    const incomingTokenIds = new Set(
+    const outgoingNftIds = new Set(outgingTransferEvents.map(event => event.returnValues.tokenId));
+
+    const incomingNftIds = new Set(
         incomingTransferEvents.map(event => event.returnValues.tokenId)
-            .filter(tokenId => !outgoingTokenIds.has(tokenId))
+            .filter(tokenId => !outgoingNftIds.has(tokenId))
     );
 
-    const outgoingTokenIds = new Set(outgingTransferEvents.map(event => event.returnValues.tokenId));
-
-    const owned = [...incomingTokenIds]
+    const owned = [...incomingNftIds]
 
     return owned;
 }
